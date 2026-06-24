@@ -142,16 +142,19 @@ def main():
         payload = {}
 
     for attempt in range(3):
+        conn = None
         try:
             conn = connect()
             ensure_schema(conn)
             upsert(conn, payload)
-            conn.close()
             break
         except sqlite3.OperationalError:
             time.sleep(0.2 * (attempt + 1))  # 锁竞争,退避重试
         except Exception:
             break  # 任何其它异常都不能影响 CC
+        finally:
+            if conn:
+                conn.close()
 
     sys.exit(0)  # 永远成功退出,绝不阻断 Claude Code
 

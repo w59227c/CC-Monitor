@@ -34,7 +34,8 @@ EVENTS = ["SessionStart", "SessionEnd", "UserPromptSubmit",
 def load():
     if os.path.exists(SETTINGS):
         try:
-            return json.load(open(SETTINGS))
+            with open(SETTINGS) as f:
+                return json.load(f)
         except Exception:
             print("⚠️  settings.json 解析失败,请手动检查"); sys.exit(1)
     return {}
@@ -66,7 +67,8 @@ def main():
             continue
         groups.append({"hooks": [{"type": "command", "command": CMD}]})
         added += 1
-    json.dump(cfg, open(SETTINGS, "w"), indent=2, ensure_ascii=False)
+    with open(SETTINGS, "w") as f:
+        json.dump(cfg, f, indent=2, ensure_ascii=False)
     print(f"✅ 已注册 {added} 个事件 hook → {SETTINGS}")
     print(f"   实际命令: {CMD}")
     print("   重启 Claude Code 会话即可生效。")

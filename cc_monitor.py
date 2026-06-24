@@ -253,6 +253,14 @@ def build_app():
             self.timer = rumps.Timer(self.tick, REFRESH_SEC)
             self.timer.start()
 
+        def cleanup_quit(self, _):
+            """关闭数据库连接后再退出。"""
+            try:
+                self.conn.close()
+            except Exception:
+                pass
+            rumps.quit_application(None)
+
         def tick(self, _):
             try:
                 merge_log_fallback(self.conn)
@@ -269,7 +277,7 @@ def build_app():
             menu += items if items else ["(暂无活跃会话)"]
             # 每次重建都手动补回「退出」,否则 clear() 会把它清掉
             menu += [None, rumps.MenuItem("退出 CC Monitor",
-                                          callback=rumps.quit_application)]
+                                          callback=self.cleanup_quit)]
             self.menu.clear()
             self.menu = menu
 
@@ -295,6 +303,8 @@ def run_cli():
             time.sleep(REFRESH_SEC)
     except KeyboardInterrupt:
         pass
+    finally:
+        conn.close()
 
 
 if __name__ == "__main__":
