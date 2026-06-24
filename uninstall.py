@@ -21,7 +21,8 @@ def clean_hooks():
         print("· settings.json 不存在,跳过 hook 清理")
         return
     try:
-        cfg = json.load(open(SETTINGS))
+        with open(SETTINGS) as f:
+            cfg = json.load(f)
     except Exception:
         print("⚠️  settings.json 解析失败,请手动检查"); return
 
@@ -43,7 +44,8 @@ def clean_hooks():
     if not hooks:
         cfg.pop("hooks", None)
 
-    json.dump(cfg, open(SETTINGS, "w"), indent=2, ensure_ascii=False)
+    with open(SETTINGS, "w") as f:
+        json.dump(cfg, f, indent=2, ensure_ascii=False)
     print(f"✅ 已从 settings.json 移除 {removed} 个 cc_hook hook")
 
 
